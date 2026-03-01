@@ -37,9 +37,9 @@ const HeroBackground = () => (
 );
 
 const Hero = () => (
-  <section className="bg-card py-16 md:py-24 relative">
+  <section className="bg-background pt-16 md:pt-24 pb-0 relative overflow-visible">
     <HeroBackground />
-    <div className="max-w-[1280px] mx-auto px-4 relative z-10">
+    <div className="max-w-[1280px] mx-auto px-4 relative z-10 pb-20">
       <div className="grid md:grid-cols-2 gap-12 items-center">
         <div>
           <h1
@@ -94,7 +94,7 @@ const Hero = () => (
           </p>
         </div>
 
-        <div className="hidden md:flex justify-end relative">
+        <div className="hidden md:flex justify-end relative mb-[-40px]">
           <img
             src={heroImage}
             alt="Job seeker"

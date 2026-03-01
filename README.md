@@ -1,73 +1,132 @@
-# Welcome to your Lovable project
+# QuickHire Platform
 
-## Project info
+A modern job board platform built with React, TypeScript, and Supabase. QuickHire allows users to browse jobs by category, search and filter listings, and apply directly through the platform. Includes a full-featured admin dashboard for managing job postings.
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+## Features
 
-## How can I edit this code?
+- 🔍 **Job Search & Filtering** - Search by title/company, filter by category and job type
+- 📊 **Category Browse** - Explore jobs across 8 categories (Design, Sales, Marketing, Finance, Technology, Engineering, Business, HR)
+- 📝 **Job Applications** - Apply directly with resume link and cover letter
+- 🔐 **Admin Dashboard** - Full CRUD operations for managing job listings
+- 🎨 **Modern UI** - Built with shadcn/ui and Tailwind CSS
+- 📱 **Responsive Design** - Works seamlessly on desktop and mobile
 
-There are several ways of editing your application.
+## Tech Stack
 
-**Use Lovable**
+- **Frontend**: React 18, TypeScript, Vite
+- **Backend**: Supabase (PostgreSQL)
+- **UI Components**: shadcn/ui, Tailwind CSS
+- **State Management**: TanStack React Query
+- **Form Validation**: React Hook Form + Zod
+- **Routing**: React Router v6
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
+## Prerequisites
 
-Changes made via Lovable will be committed automatically to this repo.
+- Node.js 16+ and npm
+- Supabase account
 
-**Use your preferred IDE**
+## Getting Started
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+### 1. Clone the repository
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+```bash
+git clone https://github.com/MdHemalRahman/quickhireplatform.git
+cd quickhireplatform
+```
 
-Follow these steps:
+### 2. Install dependencies
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+```bash
+npm install
+```
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+### 3. Set up Supabase
 
-# Step 3: Install the necessary dependencies.
-npm i
+1. Create a new project at [supabase.com](https://supabase.com)
+2. Run the SQL scripts in your Supabase SQL Editor:
+   - First run `schema.sql` to create tables
+   - Then run `seed_jobs.sql` to populate with sample data
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+### 4. Configure environment variables
+
+Create a `.env.local` file in the root directory:
+
+```env
+VITE_SUPABASE_URL=your_supabase_project_url
+VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+```
+
+Get these values from your Supabase project settings under **API**.
+
+### 5. Run the development server
+
+```bash
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+The app will be available at `http://localhost:5173`
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+## Environment Variables
 
-**Use GitHub Codespaces**
+| Variable | Description | Required |
+|----------|-------------|----------|
+| `VITE_SUPABASE_URL` | Your Supabase project URL | Yes |
+| `VITE_SUPABASE_ANON_KEY` | Your Supabase anonymous key | Yes |
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+## Admin Access
 
-## What technologies are used for this project?
+To access the admin dashboard at `/admin`:
 
-This project is built with:
+1. Go to your Supabase project dashboard
+2. Navigate to **Authentication** > **Users**
+3. Click **Add user** and create an account
+4. Use these credentials to login at `/login`
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+## Project Structure
 
-## How can I deploy this project?
+```
+src/
+├── api/              # API layer for Supabase
+├── components/       # React components
+├── pages/           # Page components
+├── hooks/           # Custom React hooks
+├── lib/             # Supabase client config
+└── types/           # TypeScript types
+```
 
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
+## Available Scripts
 
-## Can I connect a custom domain to my Lovable project?
+- `npm run dev` - Start development server
+- `npm run build` - Build for production
+- `npm run preview` - Preview production build
+- `npm run lint` - Run ESLint
 
-Yes, you can!
+## Database Schema
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+### Jobs Table
+- `id` (uuid, primary key)
+- `company` (text)
+- `title` (text)
+- `location` (text)
+- `category` (text)
+- `type` (text)
+- `description` (text)
+- `tags` (text[])
+- `created_at` (timestamp)
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+### Applications Table
+- `id` (uuid, primary key)
+- `job_id` (uuid, foreign key)
+- `name` (text)
+- `email` (text)
+- `resume_link` (text)
+- `cover_letter` (text)
+- `created_at` (timestamp)
+
+## License
+
+MIT
+
+## Author
+
+[MdHemalRahman](https://github.com/MdHemalRahman)

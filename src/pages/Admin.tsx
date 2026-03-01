@@ -4,6 +4,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { jobsApi, Job, JobInput } from '@/api/jobs';
+import { applicationsApi, Application } from '@/api/applications';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -11,8 +12,9 @@ import { Label } from '@/components/ui/label';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from 'sonner';
-import { Plus, Pencil, Trash2, Search } from 'lucide-react';
+import { Plus, Pencil, Trash2, Search, ExternalLink } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 
@@ -180,12 +182,21 @@ const JobFormDialog = ({ job, onSuccess }: { job?: Job; onSuccess: () => void })
 
 const Admin = () => {
   const [searchQuery, setSearchQuery] = useState('');
+  const [appSearchQuery, setAppSearchQuery] = useState('');
   const queryClient = useQueryClient();
 
   const { data: jobs = [], isLoading } = useQuery({
     queryKey: ['jobs'],
     queryFn: async () => {
       const { data } = await jobsApi.getJobs();
+      return data || [];
+    },
+  });
+
+  const { data: applications = [], isLoading: isLoadingApps } = useQuery({
+    queryKey: ['applications'],
+    queryFn: async () => {
+      const { data } = await applicationsApi.getApplications();
       return data || [];
     },
   });
@@ -211,92 +222,184 @@ const Admin = () => {
     job.category.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  const filteredApplications = applications.filter((app) =>
+    app.name.toLowerCase().includes(appSearchQuery.toLowerCase()) ||
+    app.email.toLowerCase().includes(appSearchQuery.toLowerCase()) ||
+    app.jobs?.title.toLowerCase().includes(appSearchQuery.toLowerCase()) ||
+    app.jobs?.company.toLowerCase().includes(appSearchQuery.toLowerCase())
+  );
+
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
       <div className="container mx-auto px-4 py-12">
-        <div className="flex justify-between items-center mb-8">
-          <div>
-            <h1 className="text-3xl font-bold">Job Management</h1>
-            <p className="text-muted-foreground mt-1">Manage all job listings</p>
-          </div>
-          <JobFormDialog onSuccess={() => {}} />
-        </div>
+        <Tabs defaultValue="jobs" className="w-full">
+          <TabsList className="mb-8">
+            <TabsTrigger value="jobs">Jobs ({jobs.length})</TabsTrigger>
+            <TabsTrigger value="applications">Applications ({applications.length})</TabsTrigger>
+          </TabsList>
 
-        <div className="mb-6">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-            <Input
-              placeholder="Search by title, company, or category..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10"
-            />
-          </div>
-        </div>
+          <TabsContent value="jobs">
+            <div className="flex justify-between items-center mb-8">
+              <div>
+                <h1 className="text-3xl font-bold">Job Management</h1>
+                <p className="text-muted-foreground mt-1">Manage all job listings</p>
+              </div>
+              <JobFormDialog onSuccess={() => {}} />
+            </div>
 
-        {isLoading ? (
-          <div className="text-center py-12">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
-          </div>
-        ) : (
-          <div className="bg-card border border-border rounded-lg overflow-hidden">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Title</TableHead>
-                  <TableHead>Company</TableHead>
-                  <TableHead>Category</TableHead>
-                  <TableHead>Type</TableHead>
-                  <TableHead>Date</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredJobs.length === 0 ? (
-                  <TableRow>
-                    <TableCell colSpan={6} className="text-center py-12 text-muted-foreground">
-                      No jobs found
-                    </TableCell>
-                  </TableRow>
-                ) : (
-                  filteredJobs.map((job) => (
-                    <TableRow key={job.id}>
-                      <TableCell className="font-medium">{job.title}</TableCell>
-                      <TableCell>{job.company}</TableCell>
-                      <TableCell>{job.category}</TableCell>
-                      <TableCell>
-                        <span className="text-xs font-medium px-2.5 py-1 rounded-full bg-primary/10 text-primary">
-                          {job.type}
-                        </span>
-                      </TableCell>
-                      <TableCell className="text-muted-foreground">
-                        {new Date(job.created_at).toLocaleDateString()}
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <div className="flex justify-end gap-2">
-                          <JobFormDialog job={job} onSuccess={() => {}} />
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleDelete(job.id, job.title)}
-                            disabled={deleteMutation.isPending}
-                          >
-                            <Trash2 className="w-4 h-4 text-destructive" />
-                          </Button>
-                        </div>
-                      </TableCell>
+            <div className="mb-6">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                <Input
+                  placeholder="Search by title, company, or category..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
+            </div>
+
+            {isLoading ? (
+              <div className="text-center py-12">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+              </div>
+            ) : (
+              <div className="bg-card border border-border rounded-lg overflow-hidden">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Title</TableHead>
+                      <TableHead>Company</TableHead>
+                      <TableHead>Category</TableHead>
+                      <TableHead>Type</TableHead>
+                      <TableHead>Date</TableHead>
+                      <TableHead className="text-right">Actions</TableHead>
                     </TableRow>
-                  ))
-                )}
-              </TableBody>
-            </Table>
-          </div>
-        )}
+                  </TableHeader>
+                  <TableBody>
+                    {filteredJobs.length === 0 ? (
+                      <TableRow>
+                        <TableCell colSpan={6} className="text-center py-12 text-muted-foreground">
+                          No jobs found
+                        </TableCell>
+                      </TableRow>
+                    ) : (
+                      filteredJobs.map((job) => (
+                        <TableRow key={job.id}>
+                          <TableCell className="font-medium">{job.title}</TableCell>
+                          <TableCell>{job.company}</TableCell>
+                          <TableCell>{job.category}</TableCell>
+                          <TableCell>
+                            <span className="text-xs font-medium px-2.5 py-1 rounded-full bg-primary/10 text-primary">
+                              {job.type}
+                            </span>
+                          </TableCell>
+                          <TableCell className="text-muted-foreground">
+                            {new Date(job.created_at).toLocaleDateString()}
+                          </TableCell>
+                          <TableCell className="text-right">
+                            <div className="flex justify-end gap-2">
+                              <JobFormDialog job={job} onSuccess={() => {}} />
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => handleDelete(job.id, job.title)}
+                                disabled={deleteMutation.isPending}
+                              >
+                                <Trash2 className="w-4 h-4 text-destructive" />
+                              </Button>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      ))
+                    )}
+                  </TableBody>
+                </Table>
+              </div>
+            )}
 
-        <div className="mt-4 text-sm text-muted-foreground">
-          Showing {filteredJobs.length} of {jobs.length} jobs
-        </div>
+            <div className="mt-4 text-sm text-muted-foreground">
+              Showing {filteredJobs.length} of {jobs.length} jobs
+            </div>
+          </TabsContent>
+
+          <TabsContent value="applications">
+            <div className="mb-8">
+              <h1 className="text-3xl font-bold">Job Applications</h1>
+              <p className="text-muted-foreground mt-1">View all candidate applications</p>
+            </div>
+
+            <div className="mb-6">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                <Input
+                  placeholder="Search by name, email, job title, or company..."
+                  value={appSearchQuery}
+                  onChange={(e) => setAppSearchQuery(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
+            </div>
+
+            {isLoadingApps ? (
+              <div className="text-center py-12">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+              </div>
+            ) : (
+              <div className="bg-card border border-border rounded-lg overflow-hidden">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Applicant</TableHead>
+                      <TableHead>Email</TableHead>
+                      <TableHead>Job Title</TableHead>
+                      <TableHead>Company</TableHead>
+                      <TableHead>Applied Date</TableHead>
+                      <TableHead className="text-right">Resume</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {filteredApplications.length === 0 ? (
+                      <TableRow>
+                        <TableCell colSpan={6} className="text-center py-12 text-muted-foreground">
+                          No applications found
+                        </TableCell>
+                      </TableRow>
+                    ) : (
+                      filteredApplications.map((app) => (
+                        <TableRow key={app.id}>
+                          <TableCell className="font-medium">{app.name}</TableCell>
+                          <TableCell>{app.email}</TableCell>
+                          <TableCell>{app.jobs?.title || 'N/A'}</TableCell>
+                          <TableCell>{app.jobs?.company || 'N/A'}</TableCell>
+                          <TableCell className="text-muted-foreground">
+                            {new Date(app.created_at).toLocaleDateString()}
+                          </TableCell>
+                          <TableCell className="text-right">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              asChild
+                            >
+                              <a href={app.resume_link} target="_blank" rel="noopener noreferrer">
+                                <ExternalLink className="w-4 h-4" />
+                              </a>
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                      ))
+                    )}
+                  </TableBody>
+                </Table>
+              </div>
+            )}
+
+            <div className="mt-4 text-sm text-muted-foreground">
+              Showing {filteredApplications.length} of {applications.length} applications
+            </div>
+          </TabsContent>
+        </Tabs>
       </div>
       <Footer />
     </div>

@@ -13,7 +13,6 @@ const applySchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
   email: z.string().email('Invalid email address'),
   resume_link: z.string().url('Resume link must be a valid URL'),
-  cover_letter: z.string().optional(),
 });
 
 type ApplyFormData = z.infer<typeof applySchema>;
@@ -94,16 +93,6 @@ export const ApplyForm = ({ jobId, onSuccess }: ApplyFormProps) => {
         {errors.resume_link && (
           <p className="text-sm text-destructive mt-1">{errors.resume_link.message}</p>
         )}
-      </div>
-
-      <div>
-        <Label htmlFor="cover_letter">Cover Letter (Optional)</Label>
-        <Textarea
-          id="cover_letter"
-          {...register('cover_letter')}
-          placeholder="Tell us why you're a great fit..."
-          rows={4}
-        />
       </div>
 
       <Button type="submit" disabled={isSubmitting} className="w-full">

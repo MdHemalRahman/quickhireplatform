@@ -18,54 +18,39 @@ const BrushUnderline = () => (
   </svg>
 );
 
-const HeroBackground = () => (
-  <div className="absolute inset-0 overflow-hidden pointer-events-none">
-    {/* Geometric lines */}
-    <svg className="absolute right-0 top-0 w-1/2 h-full opacity-[0.06]" viewBox="0 0 400 400" fill="none">
-      <line x1="50" y1="0" x2="350" y2="400" stroke="hsl(var(--primary))" strokeWidth="1" />
-      <line x1="100" y1="0" x2="400" y2="400" stroke="hsl(var(--primary))" strokeWidth="1" />
-      <line x1="0" y1="100" x2="400" y2="300" stroke="hsl(var(--primary))" strokeWidth="0.5" />
-      <circle cx="300" cy="200" r="80" stroke="hsl(var(--primary))" strokeWidth="0.5" />
-      <circle cx="250" cy="150" r="40" stroke="hsl(var(--primary))" strokeWidth="0.5" />
-    </svg>
-    {/* Angled background shape */}
-    <div
-      className="absolute right-[5%] top-[10%] w-[40%] h-[80%] rounded-3xl rotate-3"
-      style={{ background: "hsl(var(--primary) / 0.04)" }}
-    />
-  </div>
-);
-
 const Hero = () => (
-  <section className="bg-background pt-16 md:pt-24 pb-0 relative overflow-visible">
-    <HeroBackground />
-    <div className="max-w-[1280px] mx-auto px-4 relative z-10 pb-20">
-      <div className="grid md:grid-cols-2 gap-12 items-center">
+  <section className="bg-background pt-10 md:pt-20 pb-10 md:pb-0 relative overflow-hidden">
+    {/* Subtle background decoration */}
+    <div className="absolute inset-0 overflow-hidden pointer-events-none">
+      <div
+        className="absolute right-[-10%] top-[5%] w-[60%] h-[90%] rounded-3xl rotate-6 opacity-40"
+        style={{ background: "hsl(var(--primary) / 0.04)" }}
+      />
+    </div>
+
+    <div className="max-w-[1280px] mx-auto px-4 relative z-10 md:pb-20">
+      <div className="grid md:grid-cols-2 gap-8 md:gap-12 items-center">
+        {/* Text + Search */}
         <div>
           <h1
-            className="text-4xl md:text-[56px] font-extrabold leading-[1.1] text-foreground mb-0"
+            className="text-[28px] sm:text-4xl md:text-[52px] font-extrabold leading-[1.15] text-foreground mb-0"
             style={{ letterSpacing: "-0.02em" }}
           >
             Discover<br />more than<br />
-            <span className="text-primary text-[64px]">5000+ Jobs</span>
+            <span className="text-primary text-[36px] sm:text-5xl md:text-[64px]">5000+ Jobs</span>
           </h1>
           <BrushUnderline />
 
-          <p className="text-muted-foreground text-base leading-relaxed max-w-md mt-6 mb-10">
+          <p className="text-muted-foreground text-sm md:text-base leading-relaxed max-w-md mt-4 mb-6 md:mt-6 md:mb-8">
             Great platform for the job seeker that searching for new career heights and passionate about startups.
           </p>
 
-          {/* Search bar */}
+          {/* Search box — stacked on mobile */}
           <div
-            className="flex flex-col sm:flex-row bg-card border border-border rounded-xl overflow-hidden"
-            style={{
-              height: "auto",
-              minHeight: "60px",
-              borderRadius: "12px",
-              boxShadow: "0 10px 25px rgba(0,0,0,0.05)",
-            }}
+            className="bg-card border border-border rounded-xl overflow-hidden"
+            style={{ boxShadow: "0 8px 24px rgba(0,0,0,0.07)", borderRadius: "12px" }}
           >
-            <div className="flex items-center gap-2 px-4 flex-1 border-b sm:border-b-0 sm:border-r border-border h-[60px]">
+            <div className="flex items-center gap-2 px-4 border-b border-border h-[52px] md:h-[60px]">
               <Search className="w-4 h-4 text-muted-foreground shrink-0" />
               <input
                 type="text"
@@ -73,27 +58,29 @@ const Hero = () => (
                 className="bg-transparent text-sm outline-none w-full text-foreground placeholder:text-muted-foreground"
               />
             </div>
-            <div className="flex items-center gap-2 px-4 flex-1 border-b sm:border-b-0 sm:border-r border-border h-[60px]">
+            <div className="flex items-center gap-2 px-4 border-b border-border h-[52px] md:h-[60px]">
               <MapPin className="w-4 h-4 text-muted-foreground shrink-0" />
               <input
                 type="text"
-                placeholder="Florence, Italy"
+                placeholder="Location"
                 className="bg-transparent text-sm outline-none w-full text-foreground placeholder:text-muted-foreground"
               />
             </div>
-            <button
-              className="bg-primary text-primary-foreground text-sm font-semibold px-6 hover:brightness-95 transition-all m-1.5 h-[calc(60px-12px)]"
-              style={{ borderRadius: "10px" }}
-            >
-              Search my job
-            </button>
+            <div className="p-2">
+              <button
+                className="w-full bg-primary text-primary-foreground text-sm font-semibold h-11 md:h-12 rounded-[10px] hover:brightness-95 transition-all"
+              >
+                Search my job
+              </button>
+            </div>
           </div>
 
-          <p className="text-xs text-muted-foreground mt-4">
+          <p className="text-xs text-muted-foreground mt-3">
             Popular: <span className="text-foreground">UI Designer, UX Researcher, Android, Admin</span>
           </p>
         </div>
 
+        {/* Hero image — hidden on mobile */}
         <div className="hidden md:flex justify-end relative mb-[-40px]">
           <img
             src={heroImage}
